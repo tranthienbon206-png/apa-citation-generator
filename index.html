@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APA Citation Generator - Tạo trích dẫn APA 7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+        }
+
+        input,
+        select {
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-gray-800">
+
+    <header class="bg-white border-b">
+        <div class="max-w-5xl mx-auto px-5 py-5">
+            <h1 class="text-2xl font-bold text-blue-700">APA Citation Generator</h1>
+            <p class="text-sm text-gray-500 mt-1">Công cụ tạo trích dẫn tài liệu tham khảo theo chuẩn APA 7</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-5 py-10">
+        <div class="grid md:grid-cols-2 gap-7">
+
+            <section class="bg-white rounded-xl border p-6 shadow-sm">
+                <h2 class="text-lg font-semibold mb-5">Thông tin tài liệu</h2>
+
+                <label class="block text-sm font-medium mb-2">Loại tài liệu</label>
+                <select id="type" class="w-full border rounded-lg px-3 py-3 mb-5">
+                    <option value="book">Sách</option>
+                    <option value="article">Bài báo khoa học</option>
+                    <option value="website">Trang web</option>
+                </select>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Tên tác giả</label>
+                    <input id="author" type="text" placeholder="Ví dụ: Nguyen Van An"
+                        class="w-full border rounded-lg px-3 py-3">
+                    <p class="text-xs text-gray-400 mt-1">Nhiều tác giả ngăn cách bằng dấu chấm phẩy (;)</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Năm xuất bản</label>
+                    <input id="year" type="number" placeholder="Ví dụ: 2024" class="w-full border rounded-lg px-3 py-3">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Tên tài liệu</label>
+                    <input id="title" type="text" placeholder="Nhập tên tài liệu"
+                        class="w-full border rounded-lg px-3 py-3">
+                </div>
+
+                <div id="publisherField" class="mb-4">
+                    <label class="block text-sm font-medium mb-2" id="publisherLabel">Nhà xuất bản</label>
+                    <input id="publisher" type="text" placeholder="Nhập nhà xuất bản"
+                        class="w-full border rounded-lg px-3 py-3">
+                </div>
+
+                <div id="extraField" class="mb-4 hidden">
+                    <label class="block text-sm font-medium mb-2" id="extraLabel">Thông tin bổ sung</label>
+                    <input id="extra" type="text" placeholder="Nhập thông tin"
+                        class="w-full border rounded-lg px-3 py-3">
+                </div>
+
+                <div id="urlField" class="mb-5 hidden">
+                    <label class="block text-sm font-medium mb-2">Đường dẫn URL</label>
+                    <input id="url" type="url" placeholder="https://example.com"
+                        class="w-full border rounded-lg px-3 py-3">
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="generateCitation()"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition">
+                        Tạo trích dẫn
+                    </button>
+                    <button onclick="resetForm()"
+                        class="px-5 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">
+                        Xóa
+                    </button>
+                </div>
+
+                <p id="error" class="text-red-500 text-sm mt-3 hidden"></p>
+            </section>
+
+            <section class="bg-white rounded-xl border p-6 shadow-sm">
+                <h2 class="text-lg font-semibold mb-2">Kết quả trích dẫn</h2>
+                <p class="text-sm text-gray-500 mb-5">Trích dẫn được tạo theo định dạng APA 7.</p>
+
+                <div id="result" class="min-h-48 bg-gray-50 border rounded-lg p-5 text-gray-700 leading-7 break-words">
+                    <p class="text-gray-400 text-sm">Kết quả sẽ hiển thị tại đây sau khi bạn nhập thông tin.</p>
+                </div>
+
+                <button onclick="copyCitation()" id="copyButton" disabled
+                    class="w-full mt-4 bg-gray-200 text-gray-400 font-medium py-3 rounded-lg cursor-not-allowed transition">
+                    Sao chép trích dẫn
+                </button>
+
+                <div class="mt-7 border-t pt-5">
+                    <h3 class="font-semibold mb-2">Hướng dẫn sử dụng</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>1. Chọn loại tài liệu cần trích dẫn.</li>
+                        <li>2. Nhập đầy đủ thông tin tài liệu.</li>
+                        <li>3. Nhấn nút Tạo trích dẫn.</li>
+                        <li>4. Sao chép kết quả để sử dụng trong bài làm.</li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="mt-7 bg-blue-50 border border-blue-100 rounded-xl p-5">
+            <h3 class="font-semibold text-blue-800 mb-2">Lưu ý về APA 7</h3>
+            <p class="text-sm text-blue-700 leading-6">
+                Công cụ hỗ trợ tạo trích dẫn cơ bản từ thông tin bạn cung cấp.
+                Hãy kiểm tra lại tên tác giả, năm xuất bản và thông tin nguồn trước khi
+                đưa vào bài báo cáo hoặc tiểu luận.
+            </p>
+        </div>
+    </main>
+
+    <footer class="text-center text-sm text-gray-500 py-7">
+        APA Citation Generator - Công cụ hỗ trợ học tập
+    </footer>
+
+    <script>
+        const type = document.getElementById("type");
+        const publisherField = document.getElementById("publisherField");
+        const extraField = document.getElementById("extraField");
+        const urlField = document.getElementById("urlField");
+        const publisherLabel = document.getElementById("publisherLabel");
+        const extraLabel = document.getElementById("extraLabel");
+        const publisherInput = document.getElementById("publisher");
+        const extraInput = document.getElementById("extra");
+
+        let citationText = "";
+
+        type.addEventListener("change", updateFields);
+
+        function updateFields() {
+            const selected = type.value;
+
+            publisherInput.value = "";
+            extraInput.value = "";
+            document.getElementById("url").value = "";
+
+            if (selected === "book") {
+                publisherField.classList.remove("hidden");
+                extraField.classList.add("hidden");
+                urlField.classList.add("hidden");
+                publisherLabel.textContent = "Nhà xuất bản";
+                publisherInput.placeholder = "Nhập nhà xuất bản";
+            }
+
+            if (selected === "article") {
+                publisherField.classList.remove("hidden");
+                extraField.classList.remove("hidden");
+                urlField.classList.remove("hidden");
+                publisherLabel.textContent = "Tên tạp chí";
+                publisherInput.placeholder = "Ví dụ: Journal of Education";
+                extraLabel.textContent = "Tập và số phát hành";
+                extraInput.placeholder = "Ví dụ: 12(2), 25–30";
+            }
+
+            if (selected === "website") {
+                publisherField.classList.remove("hidden");
+                extraField.classList.add("hidden");
+                urlField.classList.remove("hidden");
+                publisherLabel.textContent = "Tên website";
+                publisherInput.placeholder = "Ví dụ: Bộ Giáo dục và Đào tạo";
+            }
+
+            clearResult();
+        }
+
+        function formatAuthors(value) {
+            if (!value.trim()) return "";
+
+            const authors = value.split(";").map(item => item.trim()).filter(Boolean);
+
+            return authors.map(author => {
+                const parts = author.split(/\s+/);
+                const lastName = parts.pop();
+                const initials = parts.map(name => name.charAt(0).toUpperCase() + ".").join(" ");
+
+                return initials ? `${lastName}, ${initials}` : lastName;
+            }).join(", ");
+        }
+
+        function italic(text) {
+            return `<em>${escapeHTML(text)}</em>`;
+        }
+
+        function escapeHTML(text) {
+            return text.replace(/[&<>"']/g, char => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            })[char]);
+        }
+
+        function generateCitation() {
+            const authorValue = document.getElementById("author").value.trim();
+            const yearValue = document.getElementById("year").value.trim();
+            const titleValue = document.getElementById("title").value.trim();
+            const publisherValue = publisherInput.value.trim();
+            const extraValue = extraInput.value.trim();
+            const urlValue = document.getElementById("url").value.trim();
+            const error = document.getElementById("error");
+
+            error.classList.add("hidden");
+
+            if (!authorValue || !yearValue || !titleValue || !publisherValue) {
+                showError("Vui lòng nhập đầy đủ các thông tin bắt buộc.");
+                return;
+            }
+
+            if (!/^\d{4}$/.test(yearValue)) {
+                showError("Năm xuất bản phải có 4 chữ số.");
+                return;
+            }
+
+            if (type.value !== "book" && !urlValue) {
+                showError("Vui lòng nhập đường dẫn URL.");
+                return;
+            }
+
+            if (urlValue) {
+                try {
+                    const parsedUrl = new URL(urlValue);
+                    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+                        throw new Error();
+                    }
+                } catch {
+                    showError("Đường dẫn URL không hợp lệ.");
+                    return;
+                }
+            }
+
+            const author = formatAuthors(authorValue);
+            const year = `(${yearValue}).`;
+            const title = escapeHTML(titleValue);
+            const publisher = escapeHTML(publisherValue);
+            const url = escapeHTML(urlValue);
+
+            let result = "";
+
+            if (type.value === "book") {
+                result = `${author} ${year} ${italic(title)}. ${publisher}.`;
+            }
+
+            if (type.value === "article") {
+                if (!extraValue) {
+                    showError("Vui lòng nhập tập và số phát hành hoặc số trang.");
+                    return;
+                }
+
+                const journalInfo = escapeHTML(extraValue);
+                result = `${author} ${year} ${title}. ${italic(publisher)}, ${italic(journalInfo)}. ${url}`;
+            }
+
+            if (type.value === "website") {
+                result = `${author} ${year} ${italic(title)}. ${publisher}. ${url}`;
+            }
+
+            citationText = result.replace(/<[^>]*>/g, "");
+
+            document.getElementById("result").innerHTML =
+                `<div class="leading-8">${result}</div>`;
+
+            const copyButton = document.getElementById("copyButton");
+            copyButton.disabled = false;
+            copyButton.className =
+                "w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition";
+            copyButton.textContent = "Sao chép trích dẫn";
+        }
+
+        function showError(message) {
+            const error = document.getElementById("error");
+            error.textContent = message;
+            error.classList.remove("hidden");
+        }
+
+        function copyCitation() {
+            if (!citationText) return;
+
+            navigator.clipboard.writeText(citationText).then(() => {
+                const button = document.getElementById("copyButton");
+                button.textContent = "Đã sao chép!";
+                setTimeout(() => {
+                    button.textContent = "Sao chép trích dẫn";
+                }, 1800);
+            }).catch(() => {
+                showError("Không thể sao chép. Vui lòng thử lại trên trình duyệt hỗ trợ.");
+            });
+        }
+
+        function clearResult() {
+            citationText = "";
+            document.getElementById("result").innerHTML =
+                '<p class="text-gray-400 text-sm">Kết quả sẽ hiển thị tại đây sau khi bạn nhập thông tin.</p>';
+
+            const button = document.getElementById("copyButton");
+            button.disabled = true;
+            button.className =
+                "w-full mt-4 bg-gray-200 text-gray-400 font-medium py-3 rounded-lg cursor-not-allowed";
+            button.textContent = "Sao chép trích dẫn";
+        }
+
+        function resetForm() {
+            document.getElementById("author").value = "";
+            document.getElementById("year").value = "";
+            document.getElementById("title").value = "";
+            publisherInput.value = "";
+            extraInput.value = "";
+            document.getElementById("url").value = "";
+            document.getElementById("error").classList.add("hidden");
+            clearResult();
+        }
+    </script>
+
+</body>
+
+</html>
